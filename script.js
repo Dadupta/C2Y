@@ -42,7 +42,7 @@ function handleFiles(event) {
   const files = event.target.files;
   clearError();
 
-  const allChapters = [];
+  const allSections = {};
   let filesProcessed = 0;
 
   Array.from(files).forEach(file => {
@@ -50,21 +50,12 @@ function handleFiles(event) {
     reader.onload = e => {
       try {
         const content = e.target.result;
-        let data;
+        let data = file.name.endsWith('.json') ? JSON.parse(content) : null;
 
-        if (file.name.endsWith('.json')) {
-          data = JSON.parse(content);
-        } else if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
-          data = content.split('\n').map(line => {
-            const [time, ...rest] = line.split(',');
-            return { time: parseFloat(time.trim()), title: rest.join(',').trim() };
-          });
-        } else {
-          throw new Error('Unsupported file type');
-        }
+        if (!data) throw new Error('Unsupported file type');
 
-        const chapters = extractChapters(data);
-        allChapters.push(...chapters);
+        const sections = extractAllChapters(data);
+        Object.assign(allSections, sections);
 
       } catch (err) {
         showError(`❌ Error in "${file.name}": ${err.message}`);
@@ -72,7 +63,7 @@ function handleFiles(event) {
 
       filesProcessed++;
       if (filesProcessed === files.length) {
-        updateOutput(allChapters);
+        updateOutput(allSections);
       }
     };
 
@@ -80,41 +71,58 @@ function handleFiles(event) {
   });
 }
 
-function extractChapters(data) {
-  if (!Array.isArray(data)) {
-    if (data.markers) data = data.markers;
-    else throw new Error('Unsupported JSON structure');
+function extractAllChapters(data) {
+  const sections = {};
+
+  // 1. Extract time_marks
+  if (data.time_marks?.mark_items?.length) {
+    sections['Time Marks'] = data.time_marks.mark_items.map(item => ({
+      time: parseTime(item.time_range?.start),
+      title: item.title
+    }));
   }
 
-  return data
-    .map(entry => {
-      const rawTime = entry.time || entry.timecode || entry.start || entry.time_mark;
-      const label = entry.title || entry.name || entry.label;
-      if (!rawTime || !label) return null;
+  // 2. Extract materials.texts
+  if (data.materials?.texts?.length) {
+    sections['Texts'] = data.materials.texts.map(item => ({
+      time: 0,
+      title: item.content
+    }));
+  }
 
-      return {
-        time: parseTime(Number(rawTime)),
-        title: label
-      };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.time - b.time);
+  // 3. Extract subtitle_taskinfo (optional)
+  if (data.subtitle_taskinfo?.length) {
+    sections['Subtitles'] = data.subtitle_taskinfo.map(item => ({
+      time: parseTime(item.time_range?.start),
+      title: item.text
+    }));
+  }
+
+  return sections;
 }
 
 // UI
-function updateOutput(chapters) {
+function updateOutput(sections) {
   const format = document.getElementById('time-format').value;
   const caseStyle = document.getElementById('case-format').value;
   const numbered = document.getElementById('numbering').checked;
 
-  const output = chapters.map((ch, i) => {
-    const timeStr = toTimestamp(ch.time, format);
-    let title = formatTitle(ch.title, caseStyle);
-    if (numbered) title = `${i + 1}. ${title}`;
-    return `${timeStr} ${title}`;
-  }).join('\n');
+  let output = '';
 
-  document.getElementById('output-box').value = output;
+  for (const [sectionName, entries] of Object.entries(sections)) {
+    output += `### ${sectionName} ###\n`;
+    output += entries
+      .sort((a, b) => a.time - b.time)
+      .map((ch, i) => {
+        const timeStr = toTimestamp(ch.time, format);
+        let title = formatTitle(ch.title, caseStyle);
+        if (numbered) title = `${i + 1}. ${title}`;
+        return `${timeStr} ${title}`;
+      }).join('\n');
+    output += '\n\n';
+  }
+
+  document.getElementById('output-box').value = output.trim();
   document.getElementById('save-project-btn').hidden = !firebase.auth().currentUser;
 }
 
@@ -138,30 +146,4 @@ document.getElementById('download-btn').addEventListener('click', () => {
 // Theme Toggle
 document.getElementById('theme-toggle').addEventListener('click', () => {
   document.body.classList.toggle('dark-mode');
-});
-
-// Firebase Save
-document.getElementById('save-project-btn').addEventListener('click', () => {
-  const user = firebase.auth().currentUser;
-  if (!user) return;
-
-  const title = prompt('Enter a name for this project:', `Draft ${Date.now()}`);
-  if (!title) return;
-
-  const data = {
-    title,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    chapters: document.getElementById('output-box').value.split('\n').map(line => {
-      const [time, ...titleParts] = line.trim().split(' ');
-      return {
-        time,
-        title: titleParts.join(' ')
-      };
-    })
-  };
-
-  firebase.firestore().collection('users').doc(user.uid)
-    .collection('projects').add(data)
-    .then(() => alert('Project saved!'))
-    .catch(err => alert('Error saving project: ' + err.message));
 });
