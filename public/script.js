@@ -21,6 +21,8 @@ function formatTitle(title, caseStyle = 'original') {
 }
 
 function parseTime(raw) {
+  if (typeof raw === 'string') raw = parseFloat(raw);
+  if (isNaN(raw)) return 0;
   return raw > 360000 ? raw / 1_000_000 : raw / 1_000;
 }
 
@@ -50,9 +52,32 @@ function handleFiles(event) {
     reader.onload = e => {
       try {
         const content = e.target.result;
-        let data = file.name.endsWith('.json') ? JSON.parse(content) : null;
+        let data = null;
 
-        if (!data) throw new Error('Unsupported file type');
+        if (file.name.endsWith('.json')) {
+          data = JSON.parse(content);
+        } else if (file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+          try {
+            data = JSON.parse(content);
+          } catch {
+            data = content
+              .split('\n')
+              .map(line => {
+                if (!line.trim()) return null;
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                  return {
+                    time: parseFloat(parts[0].trim()),
+                    title: parts.slice(1).join(',').trim()
+                  };
+                }
+                return null;
+              })
+              .filter(Boolean);
+          }
+        } else {
+          throw new Error('Unsupported file type: only .json, .txt, .csv allowed');
+        }
 
         const sections = extractAllChapters(data);
         Object.assign(allSections, sections);
@@ -74,28 +99,49 @@ function handleFiles(event) {
 function extractAllChapters(data) {
   const sections = {};
 
-  // 1. Extract time_marks
+  if (typeof data !== 'object') {
+    throw new Error('Unsupported data format.');
+  }
+
+  // Time Marks
   if (data.time_marks?.mark_items?.length) {
     sections['Time Marks'] = data.time_marks.mark_items.map(item => ({
       time: parseTime(item.time_range?.start),
-      title: item.title
+      title: item.title || 'Untitled'
     }));
   }
 
-  // 2. Extract materials.texts
+  // Texts
   if (data.materials?.texts?.length) {
     sections['Texts'] = data.materials.texts.map(item => ({
       time: 0,
-      title: item.content
+      title: item.content || 'Untitled'
     }));
   }
 
-  // 3. Extract subtitle_taskinfo (optional)
+  // Subtitles
   if (data.subtitle_taskinfo?.length) {
     sections['Subtitles'] = data.subtitle_taskinfo.map(item => ({
       time: parseTime(item.time_range?.start),
-      title: item.text
+      title: item.text || 'Untitled'
     }));
+  }
+
+  // Flat array fallback
+  if (Array.isArray(data)) {
+    sections['Lines'] = data
+      .map(entry => {
+        const time = entry.time || entry.start || entry.time_mark || entry.timecode;
+        const title = entry.title || entry.label || entry.name || '';
+        if (!title) return null;
+        return { time: parseTime(time), title };
+      })
+      .filter(Boolean);
+  }
+
+  // Catch-all fallback
+  if (Object.keys(sections).length === 0) {
+    throw new Error('No recognizable chapter or marker structure found.');
   }
 
   return sections;
