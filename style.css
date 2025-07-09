@@ -1,0 +1,90 @@
+body {
+  font-family: 'Nunito', sans-serif;
+  margin: 0;
+  background-color: #f5f5f5;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+header {
+  background: #4285f4;
+  color: white;
+  padding: 1em;
+  text-align: center;
+}
+
+.branding {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+main {
+  padding: 1em;
+  max-width: 900px;
+  margin: auto;
+}
+
+.drop-zone {
+  display: block;
+  border: 2px dashed #aaa;
+  padding: 2em;
+  text-align: center;
+  background: #fff;
+  cursor: pointer;
+  margin-bottom: 1em;
+}
+
+#output-box {
+  width: 100%;
+  font-family: monospace;
+  padding: 1em;
+}
+
+.actions {
+  display: flex;
+  gap: 1em;
+  margin-top: 0.5em;
+}
+
+footer {
+  text-align: center;
+  padding: 1em;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.dark-mode .drop-zone {
+  background: #2e2e2e;
+  color: #eee;
+  border-color: #555;
+}
+
+button {
+  padding: 0.5em 1em;
+  cursor: pointer;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+#settings {
+  display: flex;
+  gap: 1em;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+}
+
+select, input[type="checkbox"] {
+  margin-top: 0.3em;
+}
