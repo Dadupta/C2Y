@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C2Y – CapCut to YouTube Chapter Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@tabler/icons/iconfont/tabler-icons.min.css">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      color: #1a202c;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    .dark-mode {
+      background: #121212;
+      color: #e2e8f0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem;
+    }
+    .drop-zone {
+      border: 2px dashed #4a5568;
+      padding: 2rem;
+      text-align: center;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    .drop-zone.dragover {
+      border-color: #0d6efd;
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    .settings, .output, .actions {
+      margin-top: 1.5rem;
+    }
+    textarea {
+      width: 100%;
+      border-radius: 8px;
+      padding: 1rem;
+      resize: vertical;
+    }
+    button {
+      margin-right: 0.5rem;
+    }
+    .branding {
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="branding">📽️ CapCut to YouTube Chapter Tool</div>
+    <button id="theme-toggle" class="btn btn-outline-secondary" title="Toggle dark mode">
+      <i class="ti ti-moon"></i>
+    </button>
+  </header>
+
+  <main class="container py-4">
+    <section id="upload-area">
+      <input type="file" id="file-input" multiple hidden />
+      <label for="file-input" class="drop-zone">Drop or click to upload .json, .txt, or .csv files</label>
+      <div id="file-feedback" class="text-danger mt-2"></div>
+    </section>
+
+    <section class="settings row mt-4">
+      <div class="col-md-4">
+        <label for="time-format" class="form-label">⏱ Time Format:</label>
+        <select id="time-format" class="form-select">
+          <option value="hhmmss">HH:MM:SS</option>
+          <option value="mmss">MM:SS</option>
+          <option value="mss">M:SS</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="case-format" class="form-label">🔤 Case Style:</label>
+        <select id="case-format" class="form-select">
+          <option value="original">Original</option>
+          <option value="upper">ALL CAPS</option>
+          <option value="title">Title Case</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="numbering">
+          <label class="form-check-label" for="numbering">Number Chapters</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="output mt-4">
+      <label for="output-box" class="form-label">📋 Output:</label>
+      <textarea id="output-box" rows="10" class="form-control" placeholder="Parsed chapters will appear here..."></textarea>
+    </section>
+
+    <section class="actions mt-3">
+      <button id="copy-btn" class="btn btn-primary"><i class="ti ti-copy"></i> Copy</button>
+      <button id="download-btn" class="btn btn-success"><i class="ti ti-download"></i> Download</button>
+      <button id="save-project-btn" class="btn btn-warning" hidden><i class="ti ti-cloud-upload"></i> Save Project</button>
+    </section>
+
+    <section class="mt-5">
+      <h5>✨ Coming Soon Features</h5>
+      <ul>
+        <li>Preview YouTube-style chapter list in real time</li>
+        <li>Export to <code>.srt</code>, <code>.md</code>, and YouTube Studio format</li>
+        <li>Drag to reorder chapter titles before exporting</li>
+        <li>Auto-detect file type and structure</li>
+        <li>Light/dark theme auto-sync with system</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="text-center py-3">
+    <small>Made with ❤️ by C2Y Tools</small>
+  </footer>
+
+  <script src="robust_script.js"></script>
+</body>
+</html>
