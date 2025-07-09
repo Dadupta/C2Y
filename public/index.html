@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C2Y – CapCut to YouTube Chapter Tool</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgo=" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+  <meta name="description" content="Convert CapCut timestamps into YouTube chapters. Export as TXT, CSV, JSON, or Markdown." />
+  <meta property="og:title" content="C2Y – Convert CapCut Timestamps to YouTube Chapters" />
+  <meta property="og:description" content="Export timestamps from CapCut or Descript into YouTube-friendly chapter formats." />
+  <meta property="og:type" content="website" />
+</head>
+<body>
+  <header>
+    <h1 class="branding">CapCut to YouTube Chapter Time Bookmark Labels Export Tool</h1>
+    <button id="theme-toggle">🌓</button>
+  </header>
+  <main>
+    <section id="upload-area">
+      <input type="file" id="file-input" multiple />
+      <label for="file-input" class="drop-zone">Drop or select .json, .txt, .csv</label>
+      <div id="file-feedback"></div>
+    </section>
+
+    <section id="settings">
+      <label for="time-format">Time Format:</label>
+      <select id="time-format">
+        <option value="hhmmss">HH:MM:SS</option>
+        <option value="mmss">MM:SS</option>
+        <option value="mss">M:SS</option>
+      </select>
+
+      <label for="case-format">Case Style:</label>
+      <select id="case-format">
+        <option value="original">Original</option>
+        <option value="upper">ALL CAPS</option>
+        <option value="title">Title Case</option>
+      </select>
+
+      <label for="numbering">Number Chapters?</label>
+      <input type="checkbox" id="numbering" />
+    </section>
+
+    <section id="output">
+      <textarea id="output-box" rows="10" placeholder="Chapter output will appear here..."></textarea>
+      <div class="actions">
+        <button id="copy-btn">Copy to Clipboard</button>
+        <button id="download-btn">Download .txt</button>
+        <button id="save-project-btn" hidden>Save Project</button>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <small>Made with ❤️ by C2Y Tools</small>
+  </footer>
+  <script src="firebaseConfig.js"></script>
+  <script src="auth.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "markers": [
+    {
+      "timecode": 0,
+      "title": "Welcome"
+    },
+    {
+      "timecode": 9500,
+      "title": "Topic Overview"
+    },
+    {
+      "timecode": 38900,
+      "title": "In-depth Discussion"
+    },
+    {
+      "timecode": 72100,
+      "title": "Final Thoughts"
+    }
+  ]
+}

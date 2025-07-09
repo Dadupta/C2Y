@@ -1,0 +1,18 @@
+[
+  {
+    "start": 1000000,
+    "label": "Intro"
+  },
+  {
+    "start": 15000000,
+    "label": "Opening Scene"
+  },
+  {
+    "start": 45000000,
+    "label": "Main Content"
+  },
+  {
+    "start": 87000000,
+    "label": "Closing Remarks"
+  }
+]
